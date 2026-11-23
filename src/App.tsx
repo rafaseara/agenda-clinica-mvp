@@ -671,6 +671,14 @@ function Agenda({
     null,
   )
   const [doctorFilter, setDoctorFilter] = useState("Todos os profissionais")
+  const calendarRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    // No celular, a semana rola para os lados: leva a coluna de hoje para a tela
+    const calendar = calendarRef.current
+    const todayColumn = calendar?.querySelector<HTMLElement>(".today-column")
+    if (calendar && todayColumn && calendar.scrollWidth > calendar.clientWidth)
+      calendar.scrollLeft = Math.max(0, todayColumn.offsetLeft - 52)
+  }, [weekOffset])
   const monday = addDays(CURRENT_MONDAY, weekOffset * 7)
   const weekDays = Array.from({ length: 7 }, (_, index) =>
     addDays(monday, index),
@@ -741,7 +749,11 @@ function Agenda({
               ))}
             </select>
           </div>
-          <div className={`calendar slide-${direction}`} key={weekOffset}>
+          <div
+            className={`calendar slide-${direction}`}
+            key={weekOffset}
+            ref={calendarRef}
+          >
             <div className="calendar-head">
               <span />
               {weekDays.map((day, index) => (
